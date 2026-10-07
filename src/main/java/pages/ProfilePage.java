@@ -15,31 +15,31 @@ public class ProfilePage {
     private final WebDriver driver;
     private final WebDriverWait wait;
 
-    // ✅ Ссылка "Конструктор" в шапке (ведёт на главную)
+    // "Конструктор" в шапке (ведёт на главную)
     @FindBy(xpath = "//p[contains(text(), 'Конструктор')]/..")
     private WebElement constructorLink;
 
-    // ✅ Логотип Stellar Burgers
+    // Логотип Stellar Burgers
     @FindBy(xpath = "//div[contains(@class, 'header__logo')]")
     private WebElement logo;
 
-    // ✅ Кнопка "Выход" в боковом меню профиля
+    // Кнопка "Выход" в боковом меню профиля
     @FindBy(xpath = "//button[contains(text(), 'Выход')]")
     private WebElement logoutButton;
 
-    // ✅ Поле "Имя"
+    // Поле "Имя"
     @FindBy(xpath = "//input[@name='name']")
     private WebElement nameField;
 
-    // ✅ Поле "Email"
+    // Поле "Email"
     @FindBy(xpath = "//input[@name='email']")
     private WebElement emailField;
 
-    // ✅ Поле "Пароль"
+    // Поле "Пароль"
     @FindBy(xpath = "//input[@name='password']")
     private WebElement passwordField;
 
-    // ✅ Кнопка "Сохранить"
+    // Кнопка "Сохранить"
     @FindBy(xpath = "//button[contains(text(), 'Сохранить')]")
     private WebElement saveButton;
 
@@ -61,15 +61,31 @@ public class ProfilePage {
         return new MainPage(driver);
     }
 
-    @Step("Нажать кнопку 'Выйти'")
-    public MainPage clickLogoutButton() {
+    @Step("Нажать кнопку 'Выход'")
+    public LoginPage clickLogoutButton() {
         wait.until(ExpectedConditions.elementToBeClickable(logoutButton)).click();
-        return new MainPage(driver);
+        return new LoginPage(driver);
     }
 
-    @Step("Получить значение поля 'Имя'")
-    public String getNameFieldValue() {
-        return nameField.getAttribute("value");
+    @Step("Проверить, что кнопка 'Выход' отображается")
+    public boolean isLogoutButtonDisplayed() {
+        try {
+            wait.until(ExpectedConditions.visibilityOf(logoutButton));
+            return logoutButton.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Step("Проверить, что страница профиля загружена")
+    public boolean isProfilePageLoaded() {
+        try {
+            wait.until(ExpectedConditions.urlContains("/account"));
+            wait.until(ExpectedConditions.visibilityOf(emailField));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Step("Получить значение поля 'Email'")
@@ -77,9 +93,23 @@ public class ProfilePage {
         return emailField.getAttribute("value");
     }
 
-    @Step("Проверить, что страница профиля загружена")
-    public boolean isProfilePageLoaded() {
-        wait.until(ExpectedConditions.urlContains("/account"));
-        return true;
+       @Step("Ввести новое имя: {name}")
+    public ProfilePage enterName(String name) {
+        nameField.clear();
+        nameField.sendKeys(name);
+        return this;
     }
+
+    @Step("Ввести новый пароль: {password}")
+    public ProfilePage enterPassword(String password) {
+        passwordField.clear();
+        passwordField.sendKeys(password);
+        return this;
+    }
+
+    @Step("Нажать кнопку 'Сохранить'")
+    public void clickSaveButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(saveButton)).click();
+    }
+
 }

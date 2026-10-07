@@ -87,6 +87,6 @@ public class ConstructorPage {
     @Step("Проверить, что мы на странице конструктора")
     public boolean isOnConstructorPage() {
         String currentUrl = driver.getCurrentUrl();
-        return currentUrl.startsWith("https://stellarburgers.education-services.ru");
+        return currentUrl.startsWith(Config.BASE_URL);
     }
 }

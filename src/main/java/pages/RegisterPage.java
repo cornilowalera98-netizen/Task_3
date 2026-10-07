@@ -48,31 +48,34 @@ public class RegisterPage {
 
     @Step("Ввести имя: {name}")
     public RegisterPage enterName(String name) {
+        wait.until(ExpectedConditions.visibilityOf(nameField)).clear();
         nameField.sendKeys(name);
         return this;
     }
 
     @Step("Ввести email: {email}")
     public RegisterPage enterEmail(String email) {
+        wait.until(ExpectedConditions.visibilityOf(emailField)).clear();
         emailField.sendKeys(email);
         return this;
     }
 
     @Step("Ввести пароль: {password}")
     public RegisterPage enterPassword(String password) {
+        wait.until(ExpectedConditions.visibilityOf(passwordField)).clear();
         passwordField.sendKeys(password);
         return this;
     }
 
     @Step("Нажать кнопку 'Зарегистрироваться'")
     public MainPage clickRegisterButton() {
-        registerButton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(registerButton)).click();
         return new MainPage(driver);
     }
 
     @Step("Перейти на страницу входа по ссылке в форме регистрации")
     public LoginPage clickLoginLink() {
-        loginLink.click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginLink)).click();
         return new LoginPage(driver);
     }
 
@@ -93,10 +96,10 @@ public class RegisterPage {
     @Step("Проверить, что отображается сообщение об ошибке")
     public boolean isErrorMessageDisplayed() {
         try {
-            return errorMessage.isDisplayed();
+            wait.until(ExpectedConditions.visibilityOf(errorMessage));
+            return true;
         } catch (Exception e) {
             return false;
         }
     }
-
 }

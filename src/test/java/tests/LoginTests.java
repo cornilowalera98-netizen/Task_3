@@ -1,13 +1,19 @@
 package tests;
 
+import config.Config;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.LoginPage;
 import pages.MainPage;
 import pages.RegisterPage;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,66 +23,84 @@ public class LoginTests extends BaseTest {
 
     @BeforeEach
     void setUp() {
-        // Пользователь создаётся в BaseTest.createTestUser()
+        initDriver();
+        new MainPage(driver).open();
     }
 
-    @ParameterizedTest(name = "Переход на страницу входа по кнопке 'Войти в аккаунт' в браузере: {1}")
-    @MethodSource("tests.BaseTest#browserProvider")
+    @Test
     @Story("Переход из шапки сайта")
-    void loginViaHeaderLoginButton(String browserType, String browserName) {
-        initDriver(browserType);
-
-        MainPage mainPage = new MainPage(driver).open();
+    @DisplayName("Переход на страницу входа по кнопке 'Войти в аккаунт' в шапке сайта")
+    void loginViaHeaderLoginButton() {
+        MainPage mainPage = new MainPage(driver);
         mainPage.clickLoginButton();
-
-        assertTrue(driver.getCurrentUrl().contains("/login"),
-                "После клика на 'Войти в аккаунт' должны попасть на страницу /login");
+        assertOnLoginPage();
     }
 
-    @ParameterizedTest(name = "Переход на страницу входа по кнопке 'Личный кабинет' в браузере: {1}")
-    @MethodSource("tests.BaseTest#browserProvider")
+    @Test
     @Story("Переход из шапки сайта без авторизации")
-    void loginViaHeaderProfileButton(String browserType, String browserName) {
-        initDriver(browserType);
-
-        MainPage mainPage = new MainPage(driver).open();
+    @DisplayName("Редирект на страницу входа при клике на 'Личный кабинет' без авторизации")
+    void loginViaHeaderProfileButton() {
+        MainPage mainPage = new MainPage(driver);
         // При клике на ЛК без авторизации сайт редиректит на страницу входа
         mainPage.clickProfileButton();
-
-        assertTrue(driver.getCurrentUrl().contains("/login"),
-                "При клике на 'Личный кабинет' без авторизации должны попасть на страницу /login");
+        assertOnLoginPage();
     }
 
-    @ParameterizedTest(name = "Переход на страницу входа из формы регистрации в браузере: {1}")
-    @MethodSource("tests.BaseTest#browserProvider")
+    @Test
     @Story("Переход из формы регистрации")
-    void loginViaRegistrationForm(String browserType, String browserName) {
-        initDriver(browserType);
-
-        MainPage mainPage = new MainPage(driver).open();
+    @DisplayName("Переход на страницу входа по ссылке из формы регистрации")
+    void loginViaRegistrationForm() {
+        MainPage mainPage = new MainPage(driver);
         RegisterPage registerPage = mainPage.clickLoginButton().clickRegisterLink();
-
-        // Кликаем по ссылке "Войти" внутри формы регистрации
         registerPage.clickLoginLink();
-
-        assertTrue(driver.getCurrentUrl().contains("/login"),
-                "После клика на 'Войти' в форме регистрации должны вернуться на страницу /login");
+        assertOnLoginPage();
     }
 
-    @ParameterizedTest(name = "Переход на страницу входа из формы восстановления пароля в браузере: {1}")
-    @MethodSource("tests.BaseTest#browserProvider")
+    @Test
     @Story("Переход из формы восстановления пароля")
-    void loginViaRestorePasswordForm(String browserType, String browserName) {
-        initDriver(browserType);
-
-        MainPage mainPage = new MainPage(driver).open();
-        // Переходим: Главная -> Вход -> Восстановить пароль
+    @DisplayName("Переход на страницу входа по ссылке из формы восстановления пароля")
+    void loginViaRestorePasswordForm() {
+        MainPage mainPage = new MainPage(driver);
         var restorePage = mainPage.clickLoginButton().clickRestorePasswordLink();
-
-        // Кликаем по ссылке "Войти" на странице восстановления
         restorePage.clickLoginLink();
+        assertOnLoginPage();
+    }
 
+    @Test
+    @Story("Успешный вход существующего пользователя")
+    @DisplayName("Успешный вход в аккаунт с валидными данными существующего пользователя")
+    void loginExistingUser() {
+        createTestUser();
+
+        // Главная страница уже открыта в @BeforeEach, сразу переходим ко входу
+        MainPage mainPage = new MainPage(driver);
+        mainPage.clickLoginButton();
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.enterEmail(testUser.getEmail());
+        loginPage.enterPassword(testUser.getPassword());
+        loginPage.clickLoginButton();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlContains("/login")));
+
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(currentUrl.equals(Config.BASE_URL) ||
+                        currentUrl.startsWith(Config.BASE_URL + "?") ||
+                        currentUrl.contains("/constructor"),
+                "После успешного входа должны попасть на главную страницу. Текущий URL: " + currentUrl);
+
+        MainPage mainPageAfterLogin = new MainPage(driver);
+        assertTrue(mainPageAfterLogin.isProfileButtonDisplayed(),
+                "После входа должна отображаться кнопка 'Личный кабинет'");
+    }
+
+    private void assertOnLoginPage() {
         assertTrue(driver.getCurrentUrl().contains("/login"),
-                "После клика на 'Войти' в форме восстановления пароля должны вернуться на страницу /login");
+                "Должны попасть на страницу /login");
+
+        LoginPage loginPage = new LoginPage(driver);
+        assertTrue(loginPage.isLoginFormDisplayed(),
+                "На странице входа должна отображаться форма входа");
     }
 }

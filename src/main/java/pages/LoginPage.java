@@ -38,6 +38,17 @@ public class LoginPage {
         PageFactory.initElements(driver, this);
     }
 
+    @Step("Проверить, что форма входа отображается")
+    public boolean isLoginFormDisplayed() {
+        try {
+            wait.until(ExpectedConditions.visibilityOf(emailField));
+            wait.until(ExpectedConditions.visibilityOf(loginButton));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Step("Ввести email: {email}")
     public LoginPage enterEmail(String email) {
         wait.until(ExpectedConditions.visibilityOf(emailField)).sendKeys(email);
@@ -46,25 +57,25 @@ public class LoginPage {
 
     @Step("Ввести пароль: {password}")
     public LoginPage enterPassword(String password) {
-        passwordField.sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOf(passwordField)).sendKeys(password);
         return this;
     }
 
     @Step("Нажать кнопку 'Войти'")
     public MainPage clickLoginButton() {
-        loginButton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
         return new MainPage(driver);
     }
 
     @Step("Перейти на страницу регистрации")
     public RegisterPage clickRegisterLink() {
-        registerLink.click();
+        wait.until(ExpectedConditions.elementToBeClickable(registerLink)).click();
         return new RegisterPage(driver);
     }
 
     @Step("Перейти на страницу восстановления пароля")
     public RestorePasswordPage clickRestorePasswordLink() {
-        restorePasswordLink.click();
+        wait.until(ExpectedConditions.elementToBeClickable(restorePasswordLink)).click();
         return new RestorePasswordPage(driver);
     }
 

@@ -17,7 +17,7 @@ public class MainPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
 
-    // Кнопка "Войти в аккаунт" (универсальный локатор для <a> и <button>)
+    // Кнопка "Войти в аккаунт"
     @FindBy(xpath = "//*[contains(text(), 'Войти в аккаунт')]")
     private WebElement loginButton;
 
@@ -55,13 +55,7 @@ public class MainPage {
 
     @Step("Нажать кнопку 'Войти в аккаунт' в шапке")
     public LoginPage clickLoginButton() {
-        wait.until(ExpectedConditions.visibilityOf(loginButton));
-        wait.until(ExpectedConditions.elementToBeClickable(loginButton));
-
-        ((org.openqa.selenium.JavascriptExecutor) driver)
-                .executeScript("arguments[0].scrollIntoView(true);", loginButton);
-
-        loginButton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
         return new LoginPage(driver);
     }
 
@@ -104,18 +98,52 @@ public class MainPage {
         return this;
     }
 
+    @Step("Проверить, что кнопка 'Личный кабинет' отображается")
+    public boolean isProfileButtonDisplayed() {
+        try {
+            return profileButton.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Step("Проверить, что кнопка 'Войти в аккаунт' отображается")
+    public boolean isLoginButtonDisplayed() {
+        try {
+            wait.until(ExpectedConditions.visibilityOf(loginButton));
+            return loginButton.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Step("Проверить, что вкладка 'Булки' активна")
     public boolean isBunsTabActive() {
-        return bunsTab.getAttribute("class").contains("tab_type_current");
+        try {
+            String className = bunsTab.getAttribute("class");
+            return className != null && className.contains("tab_type_current");
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Step("Проверить, что вкладка 'Соусы' активна")
     public boolean isSaucesTabActive() {
-        return saucesTab.getAttribute("class").contains("tab_type_current");
+        try {
+            String className = saucesTab.getAttribute("class");
+            return className != null && className.contains("tab_type_current");
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Step("Проверить, что вкладка 'Начинки' активна")
     public boolean isFillingsTabActive() {
-        return fillingsTab.getAttribute("class").contains("tab_type_current");
+        try {
+            String className = fillingsTab.getAttribute("class");
+            return className != null && className.contains("tab_type_current");
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

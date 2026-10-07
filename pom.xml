@@ -13,7 +13,6 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- Стабильные, проверенные версии библиотек -->
         <selenium.version>4.18.1</selenium.version>
         <junit.version>5.10.2</junit.version>
         <webdrivermanager.version>5.9.2</webdrivermanager.version>
@@ -25,21 +24,18 @@
     </properties>
 
     <dependencies>
-        <!-- Selenium WebDriver (БЕЗ scope test, так как используется в main/java) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
         </dependency>
 
-        <!-- REST Assured для API (БЕЗ scope test, так как используется в main/java) -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${restassured.version}</version>
         </dependency>
 
-        <!-- WebDriverManager (только для тестов) -->
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
@@ -47,7 +43,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -55,7 +50,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Allure для JUnit 5 -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
@@ -63,14 +57,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Allure для RestAssured (БЕЗ scope test, так как ApiHelper в main/java) -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-rest-assured</artifactId>
             <version>${allure.version}</version>
         </dependency>
 
-        <!-- AspectJ для работы Allure -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
@@ -97,7 +89,6 @@
                 <version>${maven.surefire.version}</version>
                 <configuration>
                     <testFailureIgnore>false</testFailureIgnore>
-                    <!-- ✅ ИСПРАВЛЕНО: добавлены пропущенные символы $ -->
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>

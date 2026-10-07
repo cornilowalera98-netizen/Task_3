@@ -12,30 +12,20 @@ public class ApiHelper {
 
     @Step("Создание пользователя через API: {user.email}")
     public static Response createUser(UserData user) {
-        String body = String.format(
-                "{\"name\":\"%s\",\"email\":\"%s\",\"password\":\"%s\"}",
-                user.getName(), user.getEmail(), user.getPassword()
-        );
-
         return given()
-                .filter(new AllureRestAssured()) // ← Исправлено здесь
+                .filter(new AllureRestAssured())
                 .header("Content-Type", "application/json")
-                .body(body)
+                .body(user)
                 .when()
                 .post(Config.REGISTER_ENDPOINT);
     }
 
     @Step("Получение токена пользователя через API для удаления")
     public static String loginUserAndGetToken(UserData user) {
-        String body = String.format(
-                "{\"email\":\"%s\",\"password\":\"%s\"}",
-                user.getEmail(), user.getPassword()
-        );
-
         return given()
-                .filter(new AllureRestAssured()) // ← Исправлено здесь
+                .filter(new AllureRestAssured())
                 .header("Content-Type", "application/json")
-                .body(body)
+                .body(user)
                 .when()
                 .post(Config.LOGIN_ENDPOINT)
                 .then()
@@ -49,7 +39,7 @@ public class ApiHelper {
         String token = loginUserAndGetToken(user);
 
         given()
-                .filter(new AllureRestAssured()) // ← Исправлено здесь
+                .filter(new AllureRestAssured())
                 .header("Authorization", token)
                 .when()
                 .delete(Config.USER_ENDPOINT)
